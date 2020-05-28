@@ -20,12 +20,14 @@ window.main = async function main() {
   url.search = new URLSearchParams({
     // safe key for my github page :)
     key: 'AIzaSyCtlQ5JH_RlPQrAkZHPqz0PQVwYpI-MIvE',
-    channelId: 'UCKHhA5hN2UohhFDfNXB_cvQ', // manual do mundo
+    // channelId: 'UCKHhA5hN2UohhFDfNXB_cvQ', // manual do mundo
+    channelId: 'UC3n0qf54OPWei0bVF4W60Gw', // science gadgets
     part: 'snippet',
     maxResults: 50
   }).toString()
 
-  const res = await withCache('ytsimple-manual-mundo', () => fetch(url).then(res => res.json()))
+  const res = await withCache('ytsimple-gadgets', () => fetch(url).then(res => res.json()))
+  // const res = await withCache('ytsimple-manual-mundo', () => fetch(url).then(res => res.json()))
 
   res.items.forEach(item => addVideo(item))
 
