@@ -6,6 +6,7 @@ const config = {
   channels: [
     ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
     ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
+    ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia']
   ]
 }
 
