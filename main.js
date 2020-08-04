@@ -10,6 +10,17 @@ const config = {
   ]
 }
 
+const state = {
+  set videos(videos) {
+    Video.addAll(videos)
+    Video.refreshPlayer()
+  },
+
+  set channels(channels) {
+    channels.forEach(channel => Channel.add(channel))
+  }
+}
+
 class Storage {
   // get a valor from storage
   // if cache is valid the value isn't calculated
@@ -45,8 +56,8 @@ class Storage {
 class Video {
   static get container() { delete this.container; return this.container = document.querySelector('.videos') }
 
-  static addAll(videos, { append = true } = {}) {
-    if (!append) this.container.innerHTML = ''
+  static addAll(videos) {
+    this.container.innerHTML = ''
     videos.forEach(v => this.add(v))
   }
 
@@ -58,6 +69,40 @@ class Video {
       </div>
     </div>`
     this.container.innerHTML += embedEl
+  }
+
+  static get state() {
+    if (!this._state) this._state = { player: undefined, el: undefined }
+    return this._state
+  }
+
+  static videoClickHandler(el) {
+    return () => {
+      if (this.state.el == el) return
+
+      if (this.state.player) {
+        this.state.player.destroy()
+        this.state.player = undefined
+      }
+
+      el.setAttribute('test', 'test')
+      this.state.el = el
+      this.state.player = new Plyr(el.querySelector('.embeded-video'), {
+        youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
+      })
+
+      // this.state.player.on('statechange', event => {
+      //   if (event.detail.code == 0) { // endeded
+      //     el.textContent = 'end'
+      //   }
+      // })
+    }
+  }
+
+  static refreshPlayer() {
+    document.querySelectorAll('.video').forEach(el => {
+      el.addEventListener('click', this.videoClickHandler(el))
+    })
   }
 }
 
@@ -91,42 +136,11 @@ class Youtube {
   static channel(id) {
     return this.request('/channels', { id })
   }
-
-  static refreshPlayer() {
-    let active = { player: undefined, el: undefined }
-
-    const clickFn = el => {
-      return () => {
-        if (active.el == el) return
-
-        if (active.player) {
-          active.player.destroy()
-          active.player = undefined
-        }
-
-        el.setAttribute('test', 'test')
-        active.el = el
-        active.player = new Plyr(el.querySelector('.embeded-video'), {
-          youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
-        })
-
-        // active.player.on('statechange', event => {
-        //   if (event.detail.code == 0) { // endeded
-        //     el.textContent = 'end'
-        //   }
-        // })
-      }
-    }
-
-    document.querySelectorAll('.video').forEach(el => {
-      el.addEventListener('click', clickFn(el))
-    })
-  }
 }
 
 window.main = async function main() {
-  await Promise.all(config.channels.map(async ([id, _channelName]) => {
-    const [channel, videos] = await Storage.getSet(
+  const data = await Promise.all(config.channels.map(async ([id, _channelName]) => {
+    return Storage.getSet(
       id,
       () => {
         return Promise.all([
@@ -134,14 +148,20 @@ window.main = async function main() {
           Youtube.channelVideos(id).then(res => res.items)
         ])
       })
-    Channel.add(channel)
-    Video.addAll(videos)
   }))
-  Youtube.refreshPlayer()
+  const { channels, videos } = data.reduce((acc, [channel, videos]) => {
+    return {
+      channels: acc.channels.concat(channel),
+      videos: acc.videos.concat(videos)
+    }
+  },
+  { channels: [], videos: [] })
+
+  state.channels = channels
+  state.videos = videos
 }
 
 window.videosForChannel = function videosForChannel(id) {
   const [_channel, videos] = Storage.get(id)
-  Video.addAll(videos, { append: false })
-  Youtube.refreshPlayer()
+  state.videos = videos
 }
