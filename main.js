@@ -91,6 +91,37 @@ class Youtube {
   static channel(id) {
     return this.request('/channels', { id })
   }
+
+  static refreshPlayer() {
+    let active = { player: undefined, el: undefined }
+
+    const clickFn = el => {
+      return () => {
+        if (active.el == el) return
+
+        if (active.player) {
+          active.player.destroy()
+          active.player = undefined
+        }
+
+        el.setAttribute('test', 'test')
+        active.el = el
+        active.player = new Plyr(el.querySelector('.embeded-video'), {
+          youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
+        })
+
+        // active.player.on('statechange', event => {
+        //   if (event.detail.code == 0) { // endeded
+        //     el.textContent = 'end'
+        //   }
+        // })
+      }
+    }
+
+    document.querySelectorAll('.video').forEach(el => {
+      el.addEventListener('click', clickFn(el))
+    })
+  }
 }
 
 window.main = async function main() {
@@ -106,38 +137,11 @@ window.main = async function main() {
     Channel.add(channel)
     Video.addAll(videos)
   }))
-
-  let active = { player: undefined, el: undefined }
-
-  const clickFn = el => {
-    return () => {
-      if (active.el == el) return
-
-      if (active.player) {
-        active.player.destroy()
-        active.player = undefined
-      }
-
-      el.setAttribute('test', 'test')
-      active.el = el
-      active.player = new Plyr(el.querySelector('.embeded-video'), {
-        youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
-      })
-
-      // active.player.on('statechange', event => {
-      //   if (event.detail.code == 0) { // endeded
-      //     el.textContent = 'end'
-      //   }
-      // })
-    }
-  }
-
-  document.querySelectorAll('.video').forEach(el => {
-    el.addEventListener('click', clickFn(el))
-  })
+  Youtube.refreshPlayer()
 }
 
 window.videosForChannel = function videosForChannel(id) {
   const [_channel, videos] = Storage.get(id)
   Video.addAll(videos, { append: false })
+  Youtube.refreshPlayer()
 }
