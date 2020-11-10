@@ -1,23 +1,84 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
 
+const config = {
+  cacheTime: 12 * 60 * 60 * 1000, // 12 hours
+  ytKey: process.env.REACT_APP_YT_KEY,
+  ytMaxResults: 50,
+  channels: [
+    ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
+    // ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
+    // ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia']
+  ]
+}
+
+class Youtube {
+  static async request(path, args) {
+    const url = new URL('https://www.googleapis.com/youtube/v3' + path)
+    url.search = new URLSearchParams({
+      // safe key for my github page :)
+      key: config.ytKey,
+      part: 'snippet',
+      maxResults: config.ytMaxResults,
+      ...args
+    }).toString()
+
+    return fetch(url).then(res => res.json())
+  }
+
+  static channelVideos(channelId) {
+    return this.request('/search', { channelId, order: 'date' })
+  }
+
+  static channel(id) {
+    return this.request('/channels', { id })
+  }
+}
+
 function App() {
+  const [error, setError] = useState('')
+  const [videos, setVideos] = useState([])
+
+  useEffect(() => {
+    async function boot() {
+      try {
+        const data = await Promise.all(config.channels.map(async ([id, _channelName]) => {
+          return Promise.all([
+            // Youtube.channel(id).then(res => res.items[0]),
+            Promise.resolve([]),
+            Youtube.channelVideos(id).then(res => {
+              if (res.error) throw res.error.message
+              return res.items
+            })
+          ])
+        }))
+
+        console.log('data: ', data)
+
+        // const { _channels, videos } = data.reduce((acc, [channel, videos]) => {
+        const { videos } = data.reduce((acc, [_, videos]) => {
+          return {
+            // channels: acc.channels.concat(channel),
+            videos: acc.videos.concat(videos)
+          }
+        },
+          { channels: [], videos: [] })
+
+        setVideos(videos)
+      } catch (exception) {
+        setError(exception)
+      }
+    }
+    boot()
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="App-header">
+        {videos.map(video =>
+          <div>{video.snippet.description}</div>)}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+      </div>
     </div>
   );
 }

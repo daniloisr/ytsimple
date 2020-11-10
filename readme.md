@@ -1,3 +1,12 @@
+# YTSimple
+
+A minimal version of Youtube that mainly removes recomended videos
+
+## Links
+
+- https://developers.google.com/youtube/v3/docs/search/list?hl=pt-br
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
