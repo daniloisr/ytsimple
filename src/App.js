@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import sampleResponse from './sampleResponse.json';
+
+// cache
+// channel_id, date => cached items
 
 const config = {
   cacheTime: 12 * 60 * 60 * 1000, // 12 hours
@@ -27,7 +31,8 @@ class Youtube {
   }
 
   static channelVideos(channelId) {
-    return this.request('/search', { channelId, order: 'date' })
+    return Promise.resolve(sampleResponse)
+    // return this.request('/search', { channelId, order: 'date' })
   }
 
   static channel(id) {
@@ -53,8 +58,6 @@ function App() {
           ])
         }))
 
-        console.log('data: ', data)
-
         // const { _channels, videos } = data.reduce((acc, [channel, videos]) => {
         const { videos } = data.reduce((acc, [_, videos]) => {
           return {
@@ -74,9 +77,12 @@ function App() {
 
   return (
     <div className="App">
-      <div className="App-header">
-        {videos.map(video =>
-          <div>{video.snippet.description}</div>)}
+      <div className="Container">
+        {videos.map((video, i) =>
+          <div key={i} class="Video">
+            <img class="Video-img" src={video.snippet.thumbnails.medium.url} alt="" />
+            {/* <div class="Video-desc">{video.snippet.title}</div> */}
+          </div>)}
         {error && <div style={{ color: 'red' }}>{error}</div>}
       </div>
     </div>
