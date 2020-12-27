@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import sampleResponse from './sampleResponse.json';
+import React from 'react'
+import Plyr from 'plyr'
+import './App.css'
+import 'plyr/dist/plyr.css'
+import sampleResponse from './sampleResponse.json'
 
 // cache
 // channel_id, date => cached items
@@ -41,10 +43,16 @@ class Youtube {
 }
 
 function App() {
-  const [error, setError] = useState('')
-  const [videos, setVideos] = useState([])
+  const [activeVideo, setActiveVideo] = React.useState({ video: undefined, player: undefined })
+  const [error, setError] = React.useState('')
+  const [videos, setVideos] = React.useState([])
 
-  useEffect(() => {
+  function playVideo(video, player) {
+    if (activeVideo.player) activeVideo.player.destroy()
+    setActiveVideo({ video, player })
+  }
+
+  React.useEffect(() => {
     async function boot() {
       try {
         const data = await Promise.all(config.channels.map(async ([id, _channelName]) => {
@@ -79,14 +87,43 @@ function App() {
     <div className="App">
       <div className="Container">
         {videos.map((video, i) =>
-          <div key={i} class="Video">
-            <img class="Video-img" src={video.snippet.thumbnails.medium.url} alt="" />
-            {/* <div class="Video-desc">{video.snippet.title}</div> */}
-          </div>)}
+          <Video
+            key={i}
+            video={video}
+            isActive={video === activeVideo.video}
+            playVideo={playVideo} />
+          )}
         {error && <div style={{ color: 'red' }}>{error}</div>}
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+function Video({ video, isActive, playVideo }) {
+  const videoEl = React.useRef(null)
+
+  function initPlayer(e) {
+    if (isActive) return
+    e.preventDefault()
+
+    const player = new Plyr(videoEl.current.firstChild, {
+      youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
+    })
+
+    playVideo(video, player)
+  }
+
+  return (
+    <div
+      ref={videoEl}
+      className={["Video-container", isActive ? 'Video-container-active' : undefined].filter(i => i).join(' ')}
+      onClick={initPlayer}>
+      <div className="Video" data-plyr-provider="youtube" data-plyr-embed-id={video.id.videoId}>
+        <img className="Video-img" src={video.snippet.thumbnails.medium.url} alt="" />
+        <div className="Video-desc">{video.snippet.title}</div>
+      </div>
+    </div>
+  )
+}
+
+export default App
