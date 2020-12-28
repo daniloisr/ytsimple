@@ -1,0 +1,43 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "fb_Ar0OLumZPJO92knC5udpU0Ow",
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 5
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "JGtQx2d0dGc7BQjTbZipBxz3ZmM",
+      "id": "UCKHhA5hN2UohhFDfNXB_cvQ",
+      "snippet": {
+        "title": "Manual do Mundo",
+        "description": "Este é o canal do Manual do Mundo. Aqui é o lugar para você aprender de tudo: experiências, curiosidades científicas, dicas de sobrevivência, o que tem dentro das coisas, explicações impossíveis, viagens imperdíveis e muito mais! Somos o maior canal de Ciência e Tecnologia em Língua Portuguesa do mundo, segundo o Guinness Book!\n\nVídeos novos às terças e sábados, às 11h30, e às quintas, às 18h.\n\nDÚVIDAS: contato@manualdomundo.com.br\nCONTATO COMERCIAL: atendimento@manualdomundo.com.br\nASSESSORIA IMPRENSA: assessoria@manualdomundo.com.br",
+        "customUrl": "manualdomundo",
+        "publishedAt": "2006-07-24T13:42:36Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/ytc/AAUvwnhof3TyExzbwvs43zh-9w3-V0nLDpHBCvJR9IrYoA=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/ytc/AAUvwnhof3TyExzbwvs43zh-9w3-V0nLDpHBCvJR9IrYoA=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/ytc/AAUvwnhof3TyExzbwvs43zh-9w3-V0nLDpHBCvJR9IrYoA=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Manual do Mundo",
+          "description": "Este é o canal do Manual do Mundo. Aqui é o lugar para você aprender de tudo: experiências, curiosidades científicas, dicas de sobrevivência, o que tem dentro das coisas, explicações impossíveis, viagens imperdíveis e muito mais! Somos o maior canal de Ciência e Tecnologia em Língua Portuguesa do mundo, segundo o Guinness Book!\n\nVídeos novos às terças e sábados, às 11h30, e às quintas, às 18h.\n\nDÚVIDAS: contato@manualdomundo.com.br\nCONTATO COMERCIAL: atendimento@manualdomundo.com.br\nASSESSORIA IMPRENSA: assessoria@manualdomundo.com.br"
+        },
+        "country": "BR"
+      }
+    }
+  ]
+}

@@ -2,7 +2,6 @@ import React from 'react'
 import Plyr from 'plyr'
 import './App.css'
 import 'plyr/dist/plyr.css'
-import sampleResponse from './sampleResponse.json'
 
 // cache
 // channel_id, date => cached items
@@ -13,8 +12,8 @@ const config = {
   ytMaxResults: 50,
   channels: [
     ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
-    // ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
-    // ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia']
+    ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
+    ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia']
   ]
 }
 
@@ -22,7 +21,6 @@ class Youtube {
   static async request(path, args) {
     const url = new URL('https://www.googleapis.com/youtube/v3' + path)
     url.search = new URLSearchParams({
-      // safe key for my github page :)
       key: config.ytKey,
       part: 'snippet',
       maxResults: config.ytMaxResults,
@@ -32,63 +30,70 @@ class Youtube {
     return fetch(url).then(res => res.json())
   }
 
-  static channelVideos(channelId) {
-    return Promise.resolve(sampleResponse)
-    // return this.request('/search', { channelId, order: 'date' })
-  }
+  static channel(id) { return this.request('/channels', { id }) }
+  static channelVideos(channelId) { return this.request('/search', { channelId, order: 'date', type: 'video' }) }
+}
 
-  static channel(id) {
-    return this.request('/channels', { id })
-  }
+async function fetchYoutube() {
+  const promises = config.channels.map(async ([id, _channelName]) =>
+    Promise.all([
+      Youtube.channel(id).then(res => res.items[0]),
+      Youtube.channelVideos(id)
+        .then(res => { if (res.error) { throw res.error.message } else return res.items })
+    ])
+  )
+
+  return (await Promise.all(promises))
+    .reduce((acc, [channel, videos]) => [...acc, { ...channel, videos: videos }], [])
 }
 
 function App() {
   const [activeVideo, setActiveVideo] = React.useState({ video: undefined, player: undefined })
   const [error, setError] = React.useState('')
-  const [videos, setVideos] = React.useState([])
+  const [channel, setChannel] = React.useState()
+  const [channels, setChannels] = React.useState([])
+
+  function stopPlayer() {
+    if (activeVideo.player) activeVideo.player.destroy()
+  }
 
   function playVideo(video, player) {
-    if (activeVideo.player) activeVideo.player.destroy()
+    stopPlayer()
     setActiveVideo({ video, player })
+  }
+
+  function selectChannel(channel) {
+    stopPlayer()
+    setChannel(channel)
   }
 
   React.useEffect(() => {
     async function boot() {
       try {
-        const data = await Promise.all(config.channels.map(async ([id, _channelName]) => {
-          return Promise.all([
-            // Youtube.channel(id).then(res => res.items[0]),
-            Promise.resolve([]),
-            Youtube.channelVideos(id).then(res => {
-              if (res.error) throw res.error.message
-              return res.items
-            })
-          ])
-        }))
-
-        // const { _channels, videos } = data.reduce((acc, [channel, videos]) => {
-        const { videos } = data.reduce((acc, [_, videos]) => {
-          return {
-            // channels: acc.channels.concat(channel),
-            videos: acc.videos.concat(videos)
-          }
-        },
-          { channels: [], videos: [] })
-
-        setVideos(videos)
+        const channels = await fetchYoutube()
+        if (channels.length) setChannel(channels[0])
+        setChannels(channels)
       } catch (exception) {
         setError(exception)
       }
     }
+
     boot()
   }, [])
 
   return (
     <div className="App">
+      <div>
+        <ul>
+          {channels.map(channel =>
+            <li key={channel.id} onClick={() => selectChannel(channel)}>{channel.snippet.title}</li>
+          )}
+        </ul>
+      </div>
       <div className="Container">
-        {videos.map((video, i) =>
+        {channel && channel.videos.map(video =>
           <Video
-            key={i}
+            key={video.id.videoId}
             video={video}
             isActive={video === activeVideo.video}
             playVideo={playVideo} />
