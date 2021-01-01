@@ -9,12 +9,21 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
+  justify-items: center;
   padding: 1rem;
 }
 
-.Video-container-active {
-  grid-column-start: 1;
-  grid-column-end: -1;
+.separator {
+  height: 50px;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+.video-active {
+  width: 100vmin;
+  grid-column: 1 / -1;
 }
 
 .Video {

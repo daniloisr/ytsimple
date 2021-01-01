@@ -1,8 +1,7 @@
 import React from 'react'
-import Plyr from 'plyr'
 import * as yt from './Youtube'
+import Video from './Video'
 import './App.css'
-import 'plyr/dist/plyr.css'
 
 function App() {
   const [activeVideo, setActiveVideo] = React.useState({ video: undefined, player: undefined })
@@ -10,9 +9,7 @@ function App() {
   const [channel, setChannel] = React.useState()
   const [channels, setChannels] = React.useState([])
 
-  function stopPlayer() {
-    if (activeVideo.player) activeVideo.player.destroy()
-  }
+  function stopPlayer() { if (activeVideo.player) activeVideo.player.destroy() }
 
   function playVideo(video, player) {
     stopPlayer()
@@ -40,14 +37,16 @@ function App() {
 
   return (
     <div className="App">
-      <div>
-        <ul>
-          {channels.map(channel =>
-            <li key={channel.id} onClick={() => selectChannel(channel)}>{channel.snippet.title}</li>
-          )}
-        </ul>
-      </div>
       <div className="Container">
+        {channels.map(channel =>
+          <div className="Video" key={channel.id} onClick={() => selectChannel(channel)}>
+            <img className="Video-img" src={channel.snippet.thumbnails.medium.url} alt="" />
+            <div className="Video-desc">{channel.snippet.title}</div>
+          </div>
+        )}
+
+        <div class="full-row separator"></div>
+
         {channel && channel.videos.map(video =>
           <Video
             key={video.id.videoId}
@@ -56,33 +55,6 @@ function App() {
             playVideo={playVideo} />
           )}
         {error && <div style={{ color: 'red' }}>{error}</div>}
-      </div>
-    </div>
-  )
-}
-
-function Video({ video, isActive, playVideo }) {
-  const videoEl = React.useRef(null)
-
-  function initPlayer(e) {
-    if (isActive) return
-    e.preventDefault()
-
-    const player = new Plyr(videoEl.current.firstChild, {
-      youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
-    })
-
-    playVideo(video, player)
-  }
-
-  return (
-    <div
-      ref={videoEl}
-      className={["Video-container", isActive ? 'Video-container-active' : undefined].filter(i => i).join(' ')}
-      onClick={initPlayer}>
-      <div className="Video" data-plyr-provider="youtube" data-plyr-embed-id={video.id.videoId}>
-        <img className="Video-img" src={video.snippet.thumbnails.medium.url} alt="" />
-        <div className="Video-desc">{video.snippet.title}</div>
       </div>
     </div>
   )

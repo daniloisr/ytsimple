@@ -16,9 +16,12 @@ async function request(path, args) {
 }
 
 const enabledChannels = [
-  ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
   ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
-  ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia']
+  ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia'],
+  ['UCcXhhVwCT6_WqjkEniejRJQ', 'wintergatan'],
+  ['UC-adUJnjdrRnRlOJGoDtTqw', 'show-da-luna'],
+  ['UC-adUJnjdrRnRlOJGoDtTqw', 'kukis-trains'],
+  ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
 ]
 
 export function fetchChannels() {
