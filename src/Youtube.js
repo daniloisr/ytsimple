@@ -20,7 +20,7 @@ const enabledChannels = [
   ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia'],
   ['UCcXhhVwCT6_WqjkEniejRJQ', 'wintergatan'],
   ['UC-adUJnjdrRnRlOJGoDtTqw', 'show-da-luna'],
-  ['UC-adUJnjdrRnRlOJGoDtTqw', 'kukis-trains'],
+  ['UCtEy9dWyDez3P19XPMEpcaA', 'kukis-trains'],
   ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
 ]
 
