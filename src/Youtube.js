@@ -27,6 +27,9 @@ const enabledChannels = [
   ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
   ['UCfBeGUOYM23ZQnepxtRqDYw', 'invenções-historicas'],
   ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia'],
+  ['UCHlP-un62ExatfZlxtXR9tA', 'sprice-machines'],
+  ['UCbNvfx3rYYxEopnRGxfu53Q', 'josephs machines'],
+  ['UCdSenyHIY-kzhdz21CpBISA', 'blue-marble'],
 ]
 
 export function fetchChannels() {
