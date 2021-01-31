@@ -21,6 +21,14 @@ function App() {
     setChannel(channel)
   }
 
+  async function loadMore() {
+    const { id, videos } = channel
+
+    const res = await yt.getChannelVideos(id, videos[videos.length - 1].snippet.publishedAt)
+    channel.videos = videos.concat(res.items.slice(1))
+    setChannel(channel)
+  }
+
   React.useEffect(() => {
     async function boot() {
       try {
@@ -47,6 +55,8 @@ function App() {
 
         <div class="full-row separator"></div>
 
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+
         {channel && channel.videos.map(video =>
           <Video
             key={video.id.videoId}
@@ -54,7 +64,8 @@ function App() {
             isActive={video === activeVideo.video}
             playVideo={playVideo} />
           )}
-        {error && <div style={{ color: 'red' }}>{error}</div>}
+
+        <button onClick={loadMore}>Load more</button>
       </div>
     </div>
   )
