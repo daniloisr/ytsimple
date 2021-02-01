@@ -3,6 +3,8 @@ import * as yt from './Youtube'
 import Video from './Video'
 import './App.css'
 
+const loadMoreCache = JSON.parse(localStorage.getItem('loadMoreCache') || '{}')
+
 function App() {
   const [activeVideo, setActiveVideo] = React.useState({ video: undefined, player: undefined })
   const [error, setError] = React.useState('')
@@ -10,6 +12,7 @@ function App() {
   const [videos, setVideos] = React.useState([])
   const [channels, setChannels] = React.useState([])
   const [loading, setLoading] = React.useState(false)
+  const [canLoadMore, setCanLoadMore] = React.useState(true)
 
   function stopPlayer() { if (activeVideo.player) activeVideo.player.destroy() }
 
@@ -22,6 +25,7 @@ function App() {
     stopPlayer()
     setChannel(channel)
     setVideos(channel.videos)
+    setCanLoadMore(!(loadMoreCache[channel.id] === false))
   }
 
   async function loadMore() {
@@ -29,16 +33,22 @@ function App() {
     setLoading(true)
 
     const res = await yt.getChannelVideos(channel.id, videos[videos.length - 1].snippet.publishedAt)
+    setLoading(false)
     if (res.error) {
       setError(res.error.message)
-      setLoading(false)
+      return
+    }
+
+    if (res.items.length < 50) {
+      setCanLoadMore(false)
+      loadMoreCache[channel.id] = false;
+      localStorage.setItem('loadMoreCache', JSON.stringify(loadMoreCache))
       return
     }
 
     channel.videos = videos.concat(res.items.slice(1))
     setVideos(channel.videos)
     yt.cacheAdd({ [channel.id]: channel })
-    setLoading(false)
   }
 
   React.useEffect(() => {
@@ -46,8 +56,12 @@ function App() {
       try {
         const channels = await yt.fetchChannels()
         if (channels.length) {
-          setChannel(channels[0])
-          setVideos(channels[0].videos)
+          // TODO: fix duplication with `selectChannel` function
+          // getting a react error: "include it or remove the dependency array"
+          const channel = channels[0]
+          setChannel(channel)
+          setVideos(channel.videos)
+          setCanLoadMore(!(loadMoreCache[channel.id] === false))
         }
         setChannels(channels)
       } catch (exception) {
@@ -82,7 +96,7 @@ function App() {
       <div style={ { textAlign: 'center' } }>
         {error && <p><div style={{ color: 'red' }} dangerouslySetInnerHTML={ { __html: error } }></div></p>}
 
-        <button onClick={loadMore} className="load-more">{ loading ? 'Loading...' : 'Load more' }</button>
+        {canLoadMore && <button onClick={loadMore} className="load-more">{ loading ? 'Loading...' : 'Load more' }</button>}
       </div>
     </div>
   )
