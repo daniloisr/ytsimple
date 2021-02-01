@@ -9,6 +9,7 @@ function App() {
   const [channel, setChannel] = React.useState()
   const [videos, setVideos] = React.useState([])
   const [channels, setChannels] = React.useState([])
+  const [loading, setLoading] = React.useState(false)
 
   function stopPlayer() { if (activeVideo.player) activeVideo.player.destroy() }
 
@@ -24,8 +25,20 @@ function App() {
   }
 
   async function loadMore() {
+    if (loading) return
+    setLoading(true)
+
     const res = await yt.getChannelVideos(channel.id, videos[videos.length - 1].snippet.publishedAt)
-    setVideos(videos.concat(res.items.slice(1)))
+    if (res.error) {
+      setError(res.error.message)
+      setLoading(false)
+      return
+    }
+
+    channel.videos = videos.concat(res.items.slice(1))
+    setVideos(channel.videos)
+    yt.cacheAdd({ [channel.id]: channel })
+    setLoading(false)
   }
 
   React.useEffect(() => {
@@ -55,20 +68,22 @@ function App() {
           </div>
         )}
 
-        <div class="full-row separator"></div>
-
-        {error && <div style={{ color: 'red' }}>{error}</div>}
+        <div className="full-row separator"></div>
 
         {videos.map(video =>
           <Video
-            key={video.id.videoId}
-            video={video}
-            isActive={video === activeVideo.video}
-            playVideo={playVideo} />
+          key={video.id.videoId}
+          video={video}
+          isActive={video === activeVideo.video}
+          playVideo={playVideo} />
           )}
       </div>
 
-      <button onClick={loadMore} className="load-more">Load more</button>
+      <div style={ { textAlign: 'center' } }>
+        {error && <p><div style={{ color: 'red' }} dangerouslySetInnerHTML={ { __html: error } }></div></p>}
+
+        <button onClick={loadMore} className="load-more">{ loading ? 'Loading...' : 'Load more' }</button>
+      </div>
     </div>
   )
 }

@@ -53,8 +53,7 @@
 }
 
 .load-more {
-  display: block;
-  margin: 1rem auto;
+  margin: 1rem;
   padding: 1rem 3rem;
   font-size: 2rem;
 }

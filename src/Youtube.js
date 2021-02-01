@@ -1,7 +1,7 @@
 const cacheVersion = '1'
 const cacheKey = 'ytsimple-channels'
 const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}')
-const cacheAdd = entry => setCache(Object.assign(cache, entry, { version: cacheVersion }))
+export const cacheAdd = entry => setCache(Object.assign(cache, entry, { version: cacheVersion }))
 const setCache = cache => localStorage.setItem(cacheKey, JSON.stringify(cache))
 // if (cache.version != cacheVersion) setCache(cache = {})
 
