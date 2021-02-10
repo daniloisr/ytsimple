@@ -23,7 +23,7 @@ export default function Video({ video, isActive, playVideo }) {
       onClick={initPlayer}>
       <div className="Video" data-plyr-provider="youtube" data-plyr-embed-id={video.id.videoId}>
         <img className="Video-img" src={video.snippet.thumbnails.medium.url} alt="" />
-        <div className="Video-desc">{video.snippet.title}</div>
+        <div className="Video-desc" dangerouslySetInnerHTML={{ __html: video.snippet.title }}></div>
       </div>
     </div>
   )
