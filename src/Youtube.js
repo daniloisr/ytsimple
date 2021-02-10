@@ -18,6 +18,7 @@ async function request(path, args) {
 
 const enabledChannels = [
   ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
+  ['UCqauce-eFZbqORrvXi2MuLw', 'motor stirling'],
   ['UCcXhhVwCT6_WqjkEniejRJQ', 'wintergatan'],
   ['UC-adUJnjdrRnRlOJGoDtTqw', 'show-da-luna'],
   ['UCA6Roeo-qFVk3jvjAdag7Uw', 'cocorico'],
@@ -34,6 +35,9 @@ const enabledChannels = [
   ['UCHlP-un62ExatfZlxtXR9tA', 'sprice-machines'],
   ['UCbNvfx3rYYxEopnRGxfu53Q', 'josephs machines'],
   ['UCdSenyHIY-kzhdz21CpBISA', 'blue-marble'],
+  ['UCLlCy2FOGtMVm_xbysywkXQ', 'animusic'],
+  ['UCJ7BhmKDtLlj1C1KQoxhWJQ', 'diy toys'],
+  ['UCjW4Gs9LPvs5V4bgSIyrhJQ', 'ukulele'],
 ]
 
 export function fetchChannels() {
