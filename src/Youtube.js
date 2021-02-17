@@ -38,6 +38,8 @@ const enabledChannels = [
   ['UCLlCy2FOGtMVm_xbysywkXQ', 'animusic'],
   ['UCJ7BhmKDtLlj1C1KQoxhWJQ', 'diy toys'],
   ['UCjW4Gs9LPvs5V4bgSIyrhJQ', 'ukulele'],
+  ['UCFGIKPY_TS1KCWAyKYb1lVw', 'animusic-directory'],
+  ['UCXOPfBqPphU15a6mpW7hwVw', 'coasterfan2105'],
 ]
 
 export function fetchChannels() {
