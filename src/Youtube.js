@@ -16,34 +16,9 @@ async function request(path, args) {
   return fetch(url).then(res => res.json())
 }
 
-const enabledChannels = [
-  ['UCKHhA5hN2UohhFDfNXB_cvQ', 'manual-do-mundo'],
-  ['UCqauce-eFZbqORrvXi2MuLw', 'motor stirling'],
-  ['UCcXhhVwCT6_WqjkEniejRJQ', 'wintergatan'],
-  ['UC-adUJnjdrRnRlOJGoDtTqw', 'show-da-luna'],
-  ['UCA6Roeo-qFVk3jvjAdag7Uw', 'cocorico'],
-  ['UCtEy9dWyDez3P19XPMEpcaA', 'kukis-trains'],
-  ['UCQptNV_pmHU5UNOeX0duOkg', '04clemea'],
-  ['UCOJe7abm8byWMR3JUeWk8BQ', 'bidone'],
-  ['UCGqm0MpKDERl09nj3YNSEsQ', 'multinaatje'],
-  ['UCILHCWW-qkRdwPI7-vOsH_A', 'SouthWestSteam'],
-  ['UCUKaCiHSONDkQeUYSg0heMA', 'global-school'],
-  ['UClsFdM0HzTdF1JYoraQ0aUw', 'brick-experiment'],
-  ['UC3n0qf54OPWei0bVF4W60Gw', 'science-gadgets'],
-  ['UCfBeGUOYM23ZQnepxtRqDYw', 'invenções-historicas'],
-  ['UCn9Erjy00mpnWeLnRqhsA1g', 'ciencia-todo-dia'],
-  ['UCHlP-un62ExatfZlxtXR9tA', 'sprice-machines'],
-  ['UCbNvfx3rYYxEopnRGxfu53Q', 'josephs machines'],
-  ['UCdSenyHIY-kzhdz21CpBISA', 'blue-marble'],
-  ['UCLlCy2FOGtMVm_xbysywkXQ', 'animusic'],
-  ['UCJ7BhmKDtLlj1C1KQoxhWJQ', 'diy toys'],
-  ['UCjW4Gs9LPvs5V4bgSIyrhJQ', 'ukulele'],
-  ['UCFGIKPY_TS1KCWAyKYb1lVw', 'animusic-directory'],
-  ['UCXOPfBqPphU15a6mpW7hwVw', 'coasterfan2105'],
-]
-
-export function fetchChannels() {
-  const promises = enabledChannels.map(([id, _channelName]) => fetchChannelAndVideos(id))
+export async function fetchChannels() {
+  const channels = await fetch(process.env.REACT_APP_CHANNELS_FILE).then(res => res.json())
+  const promises = channels.map(([id, _channelName]) => fetchChannelAndVideos(id))
   return Promise.all(promises)
 }
 
