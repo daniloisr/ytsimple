@@ -43,12 +43,13 @@ export function getChannel(id) {
   return request('/channels', { id })
 }
 
-export function getChannelVideos(id, before = undefined) {
+export function getChannelVideos(id, { before = undefined, after = undefined } = {}) {
   return request('/search', {
     channelId: id,
     order: 'date',
     type: 'video',
     maxResults: 50,
-    ...(before ? { publishedBefore: before } : {})
+    ...(before ? { publishedBefore: before } : {}),
+    ...(after ? { publishedAfter: after } : {}),
   })
 }

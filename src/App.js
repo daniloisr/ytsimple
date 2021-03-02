@@ -4,6 +4,7 @@ import Video from './Video'
 import './App.css'
 
 const loadMoreCache = JSON.parse(localStorage.getItem('loadMoreCache') || '{}')
+const lastLoadCache = JSON.parse(localStorage.getItem('lastLoadCache') || '{}')
 
 function App() {
   const [activeVideo, setActiveVideo] = React.useState({ video: undefined, player: undefined })
@@ -12,8 +13,8 @@ function App() {
   const [videos, setVideos] = React.useState([])
   const [channels, setChannels] = React.useState([])
   const [loading, setLoading] = React.useState(false)
-  const [canLoadMore, _setCanLoadMore] = React.useState(true)
-  const updateLoadMore = channel => _setCanLoadMore(!(loadMoreCache[channel.id] === false) && channel.videos.length >= 50)
+  const [canLoadMore, setCanLoadMore] = React.useState(false)
+  const updateLoadMore = channel => setCanLoadMore(!(loadMoreCache[channel.id] === false) && channel.videos.length >= 50)
 
   function stopPlayer() { if (activeVideo.player) activeVideo.player.destroy() }
 
@@ -22,7 +23,25 @@ function App() {
     setActiveVideo({ video, player })
   }
 
-  function selectChannel(channel) {
+  async function selectChannel(channel) {
+    if (Date.now() - lastLoadCache[channel.id] > 24 * 60 * 60 * 1000) {
+      const res = await yt.getChannelVideos(channel.id, { after: channel.videos[0].snippet.publishedAt })
+      if (res.error) {
+        setError(res.error.message)
+        return
+      }
+
+      lastLoadCache[channel.id] = Date.now()
+      localStorage.setItem('lastLoadCache', JSON.stringify(lastLoadCache))
+
+      if (res.items.length > 1) {
+        // ignores the last result, because it's the video used on
+        // { after: channel.videos[0].snippet.publishedAt })
+        channel.videos.splice(0, 0, res.items.slice(0, -1))
+        yt.cacheAdd({ [channel.id]: channel })
+      }
+    }
+
     stopPlayer()
     setChannel(channel)
     setVideos(channel.videos)
@@ -33,7 +52,7 @@ function App() {
     if (loading) return
     setLoading(true)
 
-    const res = await yt.getChannelVideos(channel.id, videos[videos.length - 1].snippet.publishedAt)
+    const res = await yt.getChannelVideos(channel.id, { before: videos[videos.length - 1].snippet.publishedAt })
     setLoading(false)
     if (res.error) {
       setError(res.error.message)
@@ -41,7 +60,7 @@ function App() {
     }
 
     if (res.items.length < 50) {
-      updateLoadMore(false)
+      setCanLoadMore(false)
       loadMoreCache[channel.id] = false;
       localStorage.setItem('loadMoreCache', JSON.stringify(loadMoreCache))
       return
@@ -56,15 +75,22 @@ function App() {
     async function boot() {
       try {
         const channels = await yt.fetchChannels()
-        if (channels.length) {
-          // TODO: fix duplication with `selectChannel` function
-          // getting a react error: "include it or remove the dependency array"
-          const channel = channels[0]
-          setChannel(channel)
-          setVideos(channel.videos)
-          updateLoadMore(channel)
-        }
+        // if (channels.length) {
+        //   // TODO: fix duplication with `selectChannel` function
+        //   // getting a react error: "include it or remove the dependency array"
+        //   const channel = channels[0]
+        //   setChannel(channel)
+        //   setVideos(channel.videos)
+        //   updateLoadMore(channel)
+        // }
         setChannels(channels)
+        // update "lastLoadCache" to track the last time the channel was fetched
+        channels.forEach(channel => {
+          if (lastLoadCache[channel.id] === undefined) {
+            lastLoadCache[channel.id] = Date.now()
+            localStorage.setItem('lastLoadCache', JSON.stringify(lastLoadCache))
+          }
+        })
       } catch (exception) {
         setError(exception)
       }
@@ -95,7 +121,7 @@ function App() {
       </div>
 
       <div style={ { textAlign: 'center' } }>
-        {error && <p><div style={{ color: 'red' }} dangerouslySetInnerHTML={ { __html: error } }></div></p>}
+        {error && <p style={{ color: 'red' }} dangerouslySetInnerHTML={ { __html: error } }></p>}
 
         {canLoadMore && <button onClick={loadMore} className="load-more">{ loading ? 'Loading...' : 'Load more' }</button>}
       </div>
