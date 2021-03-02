@@ -12,7 +12,8 @@ function App() {
   const [videos, setVideos] = React.useState([])
   const [channels, setChannels] = React.useState([])
   const [loading, setLoading] = React.useState(false)
-  const [canLoadMore, setCanLoadMore] = React.useState(true)
+  const [canLoadMore, _setCanLoadMore] = React.useState(true)
+  const updateLoadMore = channel => _setCanLoadMore(!(loadMoreCache[channel.id] === false) && channel.videos.length >= 50)
 
   function stopPlayer() { if (activeVideo.player) activeVideo.player.destroy() }
 
@@ -25,7 +26,7 @@ function App() {
     stopPlayer()
     setChannel(channel)
     setVideos(channel.videos)
-    setCanLoadMore(!(loadMoreCache[channel.id] === false))
+    updateLoadMore(channel)
   }
 
   async function loadMore() {
@@ -40,7 +41,7 @@ function App() {
     }
 
     if (res.items.length < 50) {
-      setCanLoadMore(false)
+      updateLoadMore(false)
       loadMoreCache[channel.id] = false;
       localStorage.setItem('loadMoreCache', JSON.stringify(loadMoreCache))
       return
@@ -61,7 +62,7 @@ function App() {
           const channel = channels[0]
           setChannel(channel)
           setVideos(channel.videos)
-          setCanLoadMore(!(loadMoreCache[channel.id] === false))
+          updateLoadMore(channel)
         }
         setChannels(channels)
       } catch (exception) {
