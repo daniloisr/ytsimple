@@ -37,7 +37,7 @@ function App() {
       if (res.items.length > 1) {
         // ignores the last result, because it's the video used on
         // { after: channel.videos[0].snippet.publishedAt })
-        channel.videos.splice(0, 0, res.items.slice(0, -1))
+        channel.videos.unshift(...res.items.slice(0, -1))
         yt.cacheAdd({ [channel.id]: channel })
       }
     }
